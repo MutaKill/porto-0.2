@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - Raka</title>
+    <link rel="stylesheet" href="coba.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 15px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5em;
+        }
+
+        nav ul {
+            list-style-type: none;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: flex;
+            align-items: center;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .section {
+            padding: 60px 20px;
+        }
+
+        .bg-dark {
+            background-color: #333;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .intro {
+            font-size: 1.2em;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .skill-item {
+            display: flex;
+            align-items: center;
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .skill-item h3 {
+            margin-right: 20px;
+        }
+
+        .canvas-container {
+            width: 200px;
+            height: 200px;
+            background-color: white;
+        }
+
+        .projects-grid {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .project-card {
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 10px;
+            width: calc(50% - 10px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .project-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .bb8-toggle {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            display: flex;
+            /* align-items: center; */
+        }
+
+        .bb8-toggle-container {
+            margin-left: 150px;
+        }
+
+        .bb8-toggle__container {
+            transform-origin: center;
+            position: absolute;
+            right: 150;
+            top: 50%;
+            transform: translateY(-50%) scale(0.5);
+        }
+
+        /* animasi jika diklik */
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: #007bff;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        nav ul li a:hover,
+        nav ul li a.active {
+            color: #007bff;
+        }
+
+        nav ul li a:hover::after,
+        nav ul li a.active::after {
+            transform: scaleX(1);
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        nav ul li a.active {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        /* pennganti tema terang jadi gelap */
+
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --header-bg: #333333;
+            --header-text: #ffffff;
+            --section-bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --section-bg-alt: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            --link-color: #007bff;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --card-text: #333333;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+            --header-bg: #2c2c2c;
+            --header-text: #ffffff;
+            --section-bg: #2c2c2c;
+            --section-bg-alt: #333333;
+            --link-color: #66b0ff;
+            --card-bg: #1a1a1a;
+            --card-text: #ffffff;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .intro {
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+
+        a {
+            color: var(--link-color);
+            transition: color 0.3s ease;
+        }
+
+        .section {
+            background: var(--section-bg);
+            transition: background 0.3s ease;
+        }
+
+        .section.bg-dark {
+            background: var(--section-bg-alt);
+        }
+
+        .project-card {
+            background-color: var(--card-bg);
+            color: var(--card-text);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .skill-item {
+            background-color: var(--card-bg);
+            color: var(--card-text);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        input,
+        textarea {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        nav ul li a {
+            color: var(--header-text);
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover,
+        nav ul li a.active {
+            color: var(--link-color);
+        }
+
+        /* Ensure text readability on gradient backgrounds */
+        .section {
+            padding: 60px 20px;
+            position: relative;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: inherit;
+            z-index: -1;
+        }
+
+        .section>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 1.2em;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .navbar {
+                background-color: #333;
+                height: auto;
+                display: block;
+            }
+
+            .bb8-toggle-container {
+                margin-left: 50px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 10px;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+                /* Menambahkan ini agar tampilan link lebih rapi */
+            }
+
+            nav ul li {
+                width: 100%;
+                /* Membuat item navbar mengambil lebar penuh untuk lebih mudah diklik */
+            }
+
+            nav ul li a {
+                display: block;
+                padding: 10px;
+                /* Menambahkan padding agar lebih mudah diklik di layar kecil */
+                width: 100%;
+                text-align: left;
+                /* Mengatur agar teks rata kiri */
+            }
+
+            .bb8-toggle-container {
+                margin-left: 20px;
+            }
+        }
+        
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="logo">Raka's Portfolio</div>
+            <ul>
+                <li><a href="#about" aria-label="About Me">About Me</a></li>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#contact">Contact Me</a></li>
+                <div class="bb8-toggle-container">
+                    <label class="bb8-toggle">
+                        <input class="bb8-toggle__checkbox" type="checkbox">
+                        <div class="bb8-toggle__container">
+                            <div class="bb8-toggle__scenery">
+                                <div class="bb8-toggle__star"></div>
+                                <div class="bb8-toggle__star"></div>
+                                <div class="bb8-toggle__star"></div>
+                                <div class="bb8-toggle__star"></div>
+                                <div class="bb8-toggle__star"></div>
+                                <div class="bb8-toggle__star"></div>
+                                <div class="bb8-toggle__star"></div>
+                                <div class="tatto-1"></div>
+                                <div class="tatto-2"></div>
+                                <div class="gomrassen"></div>
+                                <div class="hermes"></div>
+                                <div class="chenini"></div>
+                                <div class="bb8-toggle__cloud"></div>
+                                <div class="bb8-toggle__cloud"></div>
+                                <div class="bb8-toggle__cloud"></div>
+                            </div>
+                            <div class="bb8">
+                                <div class="bb8__head-container">
+                                    <div class="bb8__antenna"></div>
+                                    <div class="bb8__antenna"></div>
+                                    <div class="bb8__head"></div>
+                                </div>
+                                <div class="bb8__body"></div>
+                            </div>
+                            <div class="artificial__hidden">
+                                <div class="bb8__shadow"></div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="about" class="section">
+        <div class="container">
+            <h1>Hello, I'm Raka</h1>
+            <p class="intro">I’m 15 years old, a web developer and 3D modeler passionate about creating dynamic websites
+                and 3D art. I specialize in HTML, CSS, JavaScript, and Three.js.</p>
+        </div>
+    </section>
+
+    <section id="skills" class="section bg-dark">
+        <div class="container">
+            <h2>My Skills</h2>
+            <div class="skills-grid">
+                <div class="skill-item">
+                    <h3>HTML</h3>
+                    <div id="canvas-html" class="canvas-container"></div>
+                </div>
+                <div class="skill-item">
+                    <h3>CSS</h3>
+                    <div id="canvas-css" class="canvas-container"></div>
+                </div>
+                <div class="skill-item">
+                    <h3>JavaScript</h3>
+                    <div id="canvas-js" class="canvas-container"></div>
+                </div>
+                <div class="skill-item">
+                    <h3>Three.js</h3>
+                    <div id="canvas-threejs" class="canvas-container"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+  <section id="projects" class="section">
+  <div class="container-project">
+    <h2>My Projects</h2>
+    <div class="projects-grid">
+      <div class="card">
+        <div class="card-img">
+          <img src="yuva.png" alt="Deskripsi Gambar" loading="lazy">
+        </div>
+        <div class="card-title">Project Title</div>
+        <div class="card-subtitle">
+          Project web yang pernah saya buat dengan teman teman saya dalam mengikuti lomba sagasitas.
+        </div>
+        <hr class="card-divider">
+        <div class="card-footer">
+          <button class="card-btn">view</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-img">
+          <img src="kubik.png" alt="Deskripsi Gambar" loading="lazy">
+        </div>
+        <div class="card-title">Rubik(beta)</div>
+        <div class="card-subtitle">
+          Web permainan rubik yang saya buat sendiri
+        </div>
+        <hr class="card-divider">
+        <div class="card-footer">
+            <a href="rubik.html" class="card-btn">View</a>
+        </div>
+      </div>
+
+      <!-- Tambahkan lebih banyak card di sini jika diperlukan -->
+    </div>
+  </div>
+</section>
+
+    <section id="contact" class="section bg-dark">
+        <div class="container.project">
+            <h2>Contact Me</h2>
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message:</label>
+                    <textarea id="message" name="message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="button">Send Message</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2024 Raka. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
+    <script>
+        // Fungsi umum untuk membuat renderer, scene, camera, dan model
+
+        function init3D(containerId, modelPath, scale = 4, rotationAxis = 'y', adjustPosition = { x: 0, y: 0, z: 0 }) {
+            const container = document.getElementById(containerId);
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setClearColor(0x000000, 0);
+            container.appendChild(renderer.domElement);
+
+            scene.background = null;
+
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableZoom = false;
+            controls.enablePan = false;
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(1, 1, 1).normalize();
+            scene.add(directionalLight);
+
+            let model;
+
+            const loader = new THREE.GLTFLoader();
+            loader.load(modelPath, function (gltf) {
+                model = gltf.scene;
+                model.scale.set(scale, scale, scale);
+                model.position.set(adjustPosition.x, adjustPosition.y, adjustPosition.z);
+                scene.add(model);
+
+                const box = new THREE.Box3().setFromObject(model);
+                const size = box.getSize(new THREE.Vector3()).length();
+                const center = box.getCenter(new THREE.Vector3());
+
+                // Adjust camera position to ensure full model visibility
+                const fov = camera.fov * (Math.PI / 180);
+                const cameraZ = Math.abs(size / (2 * Math.tan(fov / 2)));
+                camera.position.set(center.x, center.y, center.z + cameraZ * 1.5);
+                camera.lookAt(center);
+
+                controls.target.set(center.x, center.y, center.z);
+                controls.update();
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+                if (model) {
+                    model.rotation[rotationAxis] += 0.01;
+                }
+                renderer.render(scene, camera);
+            }
+
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+        }
+
+        // Adjust canvas size
+        const canvasSize = {
+            width: 400,
+            height: 400
+        };
+
+        document.querySelectorAll('.canvas-container').forEach(container => {
+            container.style.width = `${canvasSize.width}px`;
+            container.style.height = `${canvasSize.height}px`;
+            container.style.display = "flex";
+            container.style.justifyContent = "center";
+            container.style.alignItems = "center";
+            container.style.background = "transparent";
+        });
+
+        // Initialize 3D models with refined parameters
+        init3D('canvas-html', 'html.glb', 2., 'y', { x: 0, y: 0, z: 0 });
+        init3D('canvas-css', 'css.glb', 2., 'y', { x: 0, y: 0, z: 0 });
+        init3D('canvas-js', 'js.glb', 2, 'y', { x: 0, y: 0, z: 0 });
+        init3D('canvas-threejs', 'threejs.glb', 3, 'y', { x: 0, y: 0, z: 0 });
+
+        // animasi scrolling
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('nav ul li a');
+            const navbar = document.querySelector('nav');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+
+                    // Remove active class from all links
+                    navLinks.forEach(navLink => navLink.classList.remove('active'));
+
+                    // Add active class to clicked link
+                    link.classList.add('active');
+
+                    // Smooth scroll to the target section
+                    const targetId = link.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+                    if (targetSection) {
+                        const navbarHeight = navbar.offsetHeight;
+                        const targetPosition = targetSection.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
+
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+
+        // pengganti tema gelap menjadi terang
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggle = document.querySelector('.bb8-toggle__checkbox');
+            const body = document.body;
+            const themeIndicator = document.getElementById('theme-indicator');
+
+            function updateTheme(isDark) {
+                if (isDark) {
+                    body.setAttribute('data-theme', 'dark');
+                    themeIndicator.textContent = 'Dark Mode';
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    body.removeAttribute('data-theme');
+                    themeIndicator.textContent = 'Light Mode';
+                    localStorage.setItem('theme', 'light');
+                }
+            }
+
+            toggle.addEventListener('change', () => {
+                updateTheme(toggle.checked);
+            });
+
+            // Check for saved theme preference or prefer-color-scheme
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                toggle.checked = true;
+            }
+
+            updateTheme(toggle.checked);
+        });
+    </script>
+
+</body>
+
+</html>
