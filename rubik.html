@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js Rubik's Cube with Smooth Rotation, Quick Scramble, and Reset</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Roboto', Arial, sans-serif;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            display: block;
+        }
+        #buttons {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .btn {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+        .btn:active {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, .5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+        .btn:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+        @keyframes ripple {
+            0% { transform: scale(0, 0); opacity: 1; }
+            20% { transform: scale(25, 25); opacity: 1; }
+            100% { opacity: 0; transform: scale(40, 40); }
+        }
+        .btn i {
+            margin-right: 10px;
+        }
+        #rotate90 { background-color: #2196F3; }
+        #rotate90:hover { background-color: #1E88E5; }
+        #rotateNeg90 { background-color: #FFC107; }
+        #rotateNeg90:hover { background-color: #FFA000; }
+        #scramble { background-color: #9C27B0; }
+        #scramble:hover { background-color: #8E24AA; }
+        #reset { background-color: #F44336; }
+        #reset:hover { background-color: #E53935; }
+        #explain { background-color: #FF5722; }
+        #explain:hover { background-color: #F4511E; }
+
+        #infoPanel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 80%;
+            max-height: 80%;
+            overflow-y: auto;
+            display: none;
+        }
+
+        #infoPanel h2 {
+            color: #2196F3;
+            margin-top: 0;
+        }
+
+        #infoPanel p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        #closeInfo {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #777;
+        }
+
+        #closeInfo:hover {
+            color: #333;
+        }
+
+        .info-section {
+            margin-bottom: 20px;
+        }
+
+        .info-section h3 {
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+
+        .fun-fact {
+            background-color: #FFF9C4;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="buttons">
+        <button id="rotate90" class="btn"><i class="fas fa-redo"></i>Rotate 90°</button>
+        <button id="rotateNeg90" class="btn"><i class="fas fa-undo"></i>Rotate -90°</button>
+        <button id="scramble" class="btn"><i class="fas fa-random"></i>Scramble</button>
+        <button id="reset" class="btn"><i class="fas fa-sync"></i>Reset</button>
+        <button id="explain" class="btn"><i class="fas fa-book"></i>Explanation</button>
+    </div>
+
+    <div id="infoPanel">
+        <button id="closeInfo">&times;</button>
+        <h2>Rubik's Cube: Lebih dari Sekadar Permainan</h2>
+        
+        <div class="info-section">
+            <h3>Sejarah</h3>
+            <p>Rubik's Cube diciptakan pada tahun 1974 oleh Ernő Rubik, seorang profesor arsitektur dan seniman Hungaria. Awalnya, ia merancang kubus ini sebagai alat pengajaran untuk memahami struktur 3D.</p>
+        </div>
+
+        <div class="info-section">
+            <h3>Mekanisme</h3>
+            <p>Kubus ini terdiri dari enam wajah dengan sembilan stiker berwarna di setiap sisinya. Tujuannya adalah menyusun kembali kubus sehingga setiap sisi memiliki warna yang sama.</p>
+        </div>
+
+        <div class="info-section">
+            <h3>Cara Bermain</h3>
+            <p>1. Pelajari notasi gerakan dasar.<br>
+               2. Pahami algoritma dasar untuk menyelesaikan lapisan pertama.<br>
+               3. Selesaikan lapisan tengah.<br>
+               4. Selesaikan lapisan atas menggunakan algoritma khusus.</p>
+        </div>
+
+        <div class="fun-fact">
+            <h3>Tahukah Anda?</h3>
+            <p>Rekor dunia untuk menyelesaikan Rubik's Cube standar 3x3x3 adalah 3,47 detik, dipegang oleh Yusheng Du dari Tiongkok!</p>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+
+    
+    <script>
+        // Inisialisasi scene, camera, dan renderer
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xf0f0f0);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Inisialisasi OrbitControls
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+        // Pencahayaan
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(10, 20, 15);
+        scene.add(directionalLight);
+
+        // Rubik's Cube group
+        const rubiksCube = new THREE.Group();
+        scene.add(rubiksCube);
+
+        // Warna realistis untuk Rubik's Cube
+        const colors = {
+            red: 0xb71234,    // Merah
+            green: 0x009b48,  // Hijau
+            blue: 0x0046ad,   // Biru
+            yellow: 0xffd500, // Kuning
+            orange: 0xff5800, // Oranye
+            white: 0xffffff   // Putih
+        };
+
+        // Membuat kubus individual
+        function createCube(x, y, z) {
+            const cubeSize = 0.98; // Ukuran kubus yang sedikit lebih kecil untuk jarak yang lebih rapat
+            const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+            const materials = [
+                new THREE.MeshPhongMaterial({ color: colors.red }),    // Right
+                new THREE.MeshPhongMaterial({ color: colors.orange }), // Left
+                new THREE.MeshPhongMaterial({ color: colors.white }),  // Top
+                new THREE.MeshPhongMaterial({ color: colors.yellow }), // Bottom
+                new THREE.MeshPhongMaterial({ color: colors.green }),  // Front
+                new THREE.MeshPhongMaterial({ color: colors.blue })    // Back
+            ];
+            const cube = new THREE.Mesh(geometry, materials);
+            cube.position.set(x, y, z);
+            cube.userData = { x, y, z }; // Menyimpan posisi asli
+
+            // Menambahkan garis hitam
+            const edgesGeometry = new THREE.EdgesGeometry(geometry);
+            const edgesMaterial = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 });
+            const edges = new THREE.LineSegments(edgesGeometry, edgesMaterial);
+            cube.add(edges);
+
+            rubiksCube.add(cube);
+            return cube;
+        }
+
+        // Membuat Rubik's Cube 3x3x3
+        function createRubiksCube() {
+            for (let x = -1; x <= 1; x++) {
+                for (let y = -1; y <= 1; y++) {
+                    for (let z = -1; z <= 1; z++) {
+                        createCube(x, y, z);
+                    }
+                }
+            }
+        }
+
+        createRubiksCube();
+
+        // Mengatur posisi kamera
+        camera.position.set(5, 5, 5);
+        camera.lookAt(rubiksCube.position);
+
+        // Raycaster untuk deteksi klik
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        // Variabel untuk menyimpan kubus yang di-highlight dan informasi slice
+        let highlightedCubes = [];
+        let currentSlice = { axis: null, value: null };
+
+        // Fungsi untuk menangani klik mouse
+        function onMouseClick(event) {
+            event.preventDefault();
+
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+
+            const intersects = raycaster.intersectObjects(rubiksCube.children);
+
+            if (intersects.length > 0) {
+                const clickedCube = intersects[0].object;
+                highlightSlice(clickedCube);
+            }
+        }
+
+        // Fungsi untuk menyorot slice (9 kubus)
+        function highlightSlice(clickedCube) {
+            // Reset warna semua kubus
+            rubiksCube.children.forEach(cube => {
+                cube.material.forEach(mat => mat.emissive.setHex(0x000000));
+            });
+
+            // Reset array kubus yang di-highlight
+            highlightedCubes = [];
+
+            // Tentukan slice berdasarkan posisi kubus yang diklik
+            const { x, y, z } = clickedCube.userData;
+            let sliceAxis, sliceValue;
+
+            // Tentukan axis dan nilai slice berdasarkan posisi kubus yang diklik
+            if (Math.abs(x) > Math.abs(y) && Math.abs(x) > Math.abs(z)) {
+                sliceAxis = 'x';
+                sliceValue = x;
+            } else if (Math.abs(y) > Math.abs(z)) {
+                sliceAxis = 'y';
+                sliceValue = y;
+            } else {
+                sliceAxis = 'z';
+                sliceValue = z;
+            }
+
+            // Simpan informasi slice saat ini
+            currentSlice = { axis: sliceAxis, value: sliceValue };
+
+            // Highlight semua kubus dalam slice yang sama
+            rubiksCube.children.forEach(cube => {
+                if (cube.userData[sliceAxis] === sliceValue) {
+                    cube.material.forEach(mat => mat.emissive.setHex(0x222222));
+                    highlightedCubes.push(cube);
+                }
+            });
+        }
+
+        // Fungsi untuk merotasi slice dengan animasi yang lebih halus
+        function rotateSlice(angle, duration = 800) {
+            if (currentSlice.axis === null) return;
+
+            const axis = new THREE.Vector3();
+            if (currentSlice.axis === 'x') axis.set(1, 0, 0);
+            else if (currentSlice.axis === 'y') axis.set(0, 1, 0);
+            else axis.set(0, 0, 1);
+
+            // Membuat pivot untuk rotasi
+            const pivot = new THREE.Object3D();
+            scene.add(pivot);
+
+            // Menambahkan kubus yang dipilih ke pivot
+            highlightedCubes.forEach(cube => {
+                pivot.attach(cube);
+            });
+
+            // Animasi rotasi yang halus
+            return new Promise((resolve) => {
+                new TWEEN.Tween(pivot.rotation)
+                    .to({ [currentSlice.axis]: angle }, duration)
+                    .easing(TWEEN.Easing.Quintic.InOut) // Menggunakan easing yang lebih halus
+                    .onComplete(() => {
+                        // Kembalikan kubus ke rubiksCube dan update posisi
+                        highlightedCubes.forEach(cube => {
+                            rubiksCube.attach(cube);
+                            cube.position.round();
+                            cube.userData.x = cube.position.x;
+                            cube.userData.y = cube.position.y;
+                            cube.userData.z = cube.position.z;
+                        });
+                        scene.remove(pivot);
+                        resolve();
+                    })
+                    .start();
+            });
+        }
+
+        // Fungsi untuk melakukan gerakan acak
+        function randomMove(isScrambling = false) {
+            const axes = ['x', 'y', 'z'];
+            const values = [-1, 0, 1];
+            const rotations = [Math.PI / 2, -Math.PI / 2];
+
+            const randomAxis = axes[Math.floor(Math.random() * axes.length)];
+            const randomValue = values[Math.floor(Math.random() * values.length)];
+            const randomRotation = rotations[Math.floor(Math.random() * rotations.length)];
+
+            currentSlice = { axis: randomAxis, value: randomValue };
+            highlightedCubes = rubiksCube.children.filter(cube => cube.userData[randomAxis] === randomValue);
+
+            const duration = isScrambling ? 300 : 800; // Faster rotation for scrambling
+            return rotateSlice(randomRotation, duration);
+        }
+
+        // Fungsi untuk mengacak Rubik's Cube
+        async function scrambleCube() {
+            const numMoves = 28; // Jumlah gerakan acak
+            document.getElementById('scramble').disabled = true;
+
+            for (let i = 0; i < numMoves; i++) {
+                await randomMove(true);
+            }
+
+            document.getElementById('scramble').disabled = false;
+        }
+
+        // Fungsi untuk mereset Rubik's Cube
+        function resetCube() {
+            // Hapus semua kubus yang ada
+            while(rubiksCube.children.length > 0) {
+                rubiksCube.remove(rubiksCube.children[0]);
+            }
+
+            // Buat kembali Rubik's Cube
+            createRubiksCube();
+
+            // Reset highlight dan slice yang aktif
+            highlightedCubes = [];
+            currentSlice = { axis: null, value: null };
+        }
+
+        // Event listener untuk tombol rotasi dengan penambahan jeda
+        let isRotating = false;
+        document.getElementById('rotate90').addEventListener('click', () => {
+            if (!isRotating) {
+                isRotating = true;
+                rotateSlice(Math.PI / 2).then(() => {
+                    isRotating = false;
+                });
+            }
+        });
+        document.getElementById('rotateNeg90').addEventListener('click', () => {
+            if (!isRotating) {
+                isRotating = true;
+                rotateSlice(-Math.PI / 2).then(() => {
+                    isRotating = false;
+                });
+            }
+        });
+
+        // Event listener untuk tombol scramble
+        document.getElementById('scramble').addEventListener('click', scrambleCube);
+
+        // Event listener untuk tombol reset
+        document.getElementById('reset').addEventListener('click', resetCube);
+
+        // Tambahkan event listener untuk klik
+        window.addEventListener('click', onMouseClick, false);
+
+        // Fungsi animasi
+        function animate(time) {
+            requestAnimationFrame(animate);
+            TWEEN.update(time);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Mulai animasi
+        animate();
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        document.getElementById('explain').addEventListener('click', function() {
+            document.getElementById('infoPanel').style.display = 'block';
+        });
+
+        document.getElementById('closeInfo').addEventListener('click', function() {
+            document.getElementById('infoPanel').style.display = 'none';
+        });
+        
+    </script>
+</body>
+</html>
